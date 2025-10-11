@@ -1,3 +1,0 @@
-C:/Users/Familie Goyvaerts/CLionProjects/MB_ProgrammeerOpdrachten/cmake-build-debug/CMakeFiles/MB_ProgrammeerOpdrachten.dir
-C:/Users/Familie Goyvaerts/CLionProjects/MB_ProgrammeerOpdrachten/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Familie Goyvaerts/CLionProjects/MB_ProgrammeerOpdrachten/cmake-build-debug/CMakeFiles/rebuild_cache.dir
