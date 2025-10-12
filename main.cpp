@@ -4,7 +4,7 @@
 using namespace std;
 
 int main() {
-    CFG cfg;
+    CFG cfg("C:\\Users\\Familie Goyvaerts\\CLionProjects\\MB_ProgrammeerOpdrachten\\CFG.json");
     cfg.print();
     return 0;
 }

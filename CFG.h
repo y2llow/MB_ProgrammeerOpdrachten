@@ -10,14 +10,14 @@ using namespace std;
 
 class CFG {
 public:
-    std::vector<string> V;
-    std::vector<string> T;
-    std::map<string, vector <vector <string>>> P;
+    vector<string> V;
+    vector<string> T;
+    map<string, vector<vector<string>>> P;
     string S;
 
-    CFG();
+    explicit CFG(const string &filename);
+
     void print() const;
 };
 
-
-#endif //TEST_CFG_H
+#endif
