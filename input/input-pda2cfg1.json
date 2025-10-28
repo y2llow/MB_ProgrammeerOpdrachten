@@ -1,10 +1,13 @@
 {
-    "Variables": ["S","BINDIGIT"],
-    "Terminals": ["a", "b","0", "1"],
-    "Productions": [
-        {"head": "S", "body": ["a", "S", "b","BINDIGIT"]}, {"head": "S", "body": []},
-        {"head": "BINDIGIT", "body": ["0"]},
-        {"head": "BINDIGIT", "body": ["1"]}
+    "States": ["p", "q"],
+    "Alphabet": ["0", "1"],
+    "StackAlphabet": ["X", "Z0"],
+    "Transitions": [
+        {"from": "q", "input": "1", "stacktop": "X", "to": "p", "replacement": []},
+        {"from": "p", "input": "1", "stacktop": "X", "to": "p", "replacement": []},
+        {"from": "q", "input": "0", "stacktop": "Z0", "to": "q", "replacement": ["X"]},
+        {"from": "q", "input": "0", "stacktop": "X", "to": "q", "replacement": ["X", "X"]}
     ],
-    "Start": "S"
+    "StartState": "q",
+    "StartStack": "Z0"
 }

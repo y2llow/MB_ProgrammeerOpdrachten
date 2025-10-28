@@ -1,13 +1,31 @@
-//
-// Created by y2llow on 10/28/25.
-//
-
 #ifndef MB_PROGRAMMEEROPDRACHTEN_PDA_H
 #define MB_PROGRAMMEEROPDRACHTEN_PDA_H
 
+#include <utility>
+#include <vector>
+#include <map>
+#include <string>
+using namespace std;
+
+struct Transition {
+    string from;
+    string input;
+    string stacktop;
+    string to;
+    vector<string> replacement;
+};
 
 class PDA {
+public:
+    vector<std::string> States;
+    vector<std::string> Alphabet;
+    vector<std::string> StackAlphabet;
+    Transition Transitions ;
+    string StartState;
+    string StartStack;
+
 };
+
 
 
 #endif //MB_PROGRAMMEEROPDRACHTEN_PDA_H

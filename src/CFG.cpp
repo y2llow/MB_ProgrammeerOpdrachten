@@ -1,5 +1,5 @@
-#include "CFG.h"
-#include "json.hpp"
+#include "../include/CFG.h"
+#include "../json.hpp"
 #include <fstream>
 #include <algorithm>
 #include <sstream>

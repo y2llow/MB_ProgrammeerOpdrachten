@@ -4,7 +4,6 @@ project(MB_ProgrammeerOpdrachten)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(MB_ProgrammeerOpdrachten main.cpp
-        CFG.cpp
-        PDA.cpp
-        PDA.h
+        src/CFG.cpp
+        src/PDA.cpp
 )
