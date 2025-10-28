@@ -20,7 +20,7 @@ CFG::CFG(const string &filename) {
 
     // Variabelen en terminals inlezen
     if (j.contains("Variables") && j["Variables"].is_array()) {
-        for (const auto &v : j["Variables"]) V.push_back(v.get<string>());
+        for (const auto &v : j["Variables"]) V.push_back(v.get<vector<string>>());
     }
 
     if (j.contains("Terminals") && j["Terminals"].is_array()) {
@@ -40,7 +40,7 @@ CFG::CFG(const string &filename) {
             }
 
             // Voeg toe aan producties
-            P[head].push_back(body);
+            P[{head}].push_back({body});
         }
     }
 
@@ -53,17 +53,33 @@ CFG::CFG(const string &filename) {
 void CFG::print() const {
     std::ostringstream out;
 
-    // V
+    // --- V ---
     out << "V = {";
     auto sortedV = V;
-    std::sort(sortedV.begin(), sortedV.end());
+    std::sort(sortedV.begin(), sortedV.end(), [](const std::vector<std::string> &a, const std::vector<std::string> &b) {
+        for (size_t i = 0; i < std::min(a.size(), b.size()); ++i) {
+            if (a[i] != b[i])
+                return a[i] < b[i]; // ASCII-vergelijking
+        }
+        return a.size() < b.size();
+    });
     for (size_t i = 0; i < sortedV.size(); i++) {
-        out << sortedV[i];
+        const auto &var = sortedV[i];
+        if (var.size() == 1) {
+            out << var[0];
+        } else {
+            out << "[";
+            for (size_t j = 0; j < var.size(); ++j) {
+                out << var[j];
+                if (j + 1 != var.size()) out << ",";
+            }
+            out << "]";
+        }
         if (i + 1 != sortedV.size()) out << ", ";
     }
     out << "}\n";
 
-    // T
+    // --- T ---
     out << "T = {";
     auto sortedT = T;
     std::sort(sortedT.begin(), sortedT.end());
@@ -73,36 +89,81 @@ void CFG::print() const {
     }
     out << "}\n";
 
-    // P
+    // --- P ---
     out << "P = {\n";
 
-// sorteer producties per variabele in ASCII-volgorde
-    for (const auto &var : sortedV) {
-        if (P.count(var)) {
-            auto bodies = P.at(var);
-            std::sort(bodies.begin(), bodies.end(), [](const vector<string> &a, const vector<string> &b) {
-                for (size_t i = 0; i < min(a.size(), b.size()); ++i) {
-                    if (a[i] != b[i])
-                        return a[i] < b[i];
-                }
-                return a.size() < b.size();
-            });
+    // Sort keys ASCII-style
+    std::vector<std::vector<std::string>> sortedKeys;
+    for (const auto &pair : P) sortedKeys.push_back(pair.first);
+    std::sort(sortedKeys.begin(), sortedKeys.end(), [](const std::vector<std::string> &a, const std::vector<std::string> &b) {
+        for (size_t i = 0; i < std::min(a.size(), b.size()); ++i) {
+            if (a[i] != b[i])
+                return a[i] < b[i]; // ASCII compare
+        }
+        return a.size() < b.size();
+    });
 
-            //Producties printen
-            for (const auto &body : bodies) {
-                out << "    " << var << " -> `";
-                for (size_t j = 0; j < body.size(); j++) {
-                    if (j > 0) out << " ";
-                    out << body[j];
-                }
-                out << "`\n";
+    // Print each production
+    for (const auto &key : sortedKeys) {
+        auto it = P.find(key);
+        if (it == P.end()) continue;
+        const auto &productions = it->second;
+
+        // sort bodies inside each key (optional but consistent)
+        auto sortedProductions = productions;
+        std::sort(sortedProductions.begin(), sortedProductions.end(), [](const std::vector<std::vector<std::string>> &a,
+                                                                         const std::vector<std::vector<std::string>> &b) {
+            if (a.empty() || b.empty()) return a.size() < b.size();
+            for (size_t i = 0; i < std::min(a[0].size(), b[0].size()); ++i) {
+                if (a[0][i] != b[0][i])
+                    return a[0][i] < b[0][i];
             }
+            return a.size() < b.size();
+        });
+
+        for (const auto &bodySet : sortedProductions) {
+            // left-hand side
+            out << "    ";
+            if (key.size() == 1) {
+                out << key[0];
+                if (key[0].size() < 3) out << "   ";
+                else out << " ";
+            } else {
+                out << "[";
+                for (size_t j = 0; j < key.size(); ++j) {
+                    out << key[j];
+                    if (j + 1 != key.size()) out << ",";
+                }
+                out << "]  ";
+                if (key.size() == 3) out << " ";
+            }
+
+            out << "-> `";
+
+            // right-hand side
+            for (size_t j = 0; j < bodySet.size(); ++j) {
+                const auto &part = bodySet[j];
+                if (j > 0) out << " ";
+                if (part.size() == 1) {
+                    out << part[0];
+                } else {
+                    out << "[";
+                    for (size_t k = 0; k < part.size(); ++k) {
+                        out << part[k];
+                        if (k + 1 != part.size()) out << ",";
+                    }
+                    out << "]";
+                }
+            }
+            out << "`\n";
         }
     }
+
     out << "}\n";
 
-    // S
+    // --- S ---
     out << "S = " << S;
 
     std::cout << out.str() << std::endl;
 }
+

@@ -10,14 +10,15 @@ using namespace std;
 
 class CFG {
 public:
-    vector<string> V;
+    vector<vector<string>> V;
     vector<string> T;
-    map<string, vector<vector<string>>> P;
+    map<vector<string>, vector<vector<vector<string>>>> P;
     string S;
 
     explicit CFG(const string &filename);
+    CFG () = default;
 
-    void print() const;
+     void print() const;
 };
 
 #endif

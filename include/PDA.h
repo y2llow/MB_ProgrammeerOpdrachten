@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "CFG.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ public:
 
     explicit PDA(const string &filename);
 
+    CFG toCFG();
 };
 
 
