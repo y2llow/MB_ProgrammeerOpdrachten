@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <string>
+
 using namespace std;
 
 struct Transition {
@@ -20,9 +21,11 @@ public:
     vector<std::string> States;
     vector<std::string> Alphabet;
     vector<std::string> StackAlphabet;
-    Transition Transitions ;
+    vector <Transition> Transitions ;
     string StartState;
     string StartStack;
+
+    explicit PDA(const string &filename);
 
 };
 
