@@ -76,7 +76,7 @@ SOFTWARE.
 #include <stdexcept> // runtime_error
 #include <string> // to_string
 
-// #include <nlohmann/detail/input/position_t.hpp>
+// #include <nlohmann/detail/txt_json/position_t.hpp>
 
 
 #include <cstddef> // size_t
@@ -1895,14 +1895,14 @@ This exception is thrown by the library when a parse error occurs. Parse errors
 can occur during the deserialization of JSON text, CBOR, MessagePack, as well
 as when using JSON Patch.
 
-Member @a byte holds the byte index of the last read character in the input
+Member @a byte holds the byte index of the last read character in the txt_json
 file.
 
 Exceptions have ids 1xx.
 
 name / id                      | example message | description
 ------------------------------ | --------------- | -------------------------
-json.exception.parse_error.101 | parse error at 2: unexpected end of input; expected string literal | This error indicates a syntax error while deserializing a JSON text. The error message describes that an unexpected token (character) was encountered, and the member @a byte indicates the error position.
+json.exception.parse_error.101 | parse error at 2: unexpected end of txt_json; expected string literal | This error indicates a syntax error while deserializing a JSON text. The error message describes that an unexpected token (character) was encountered, and the member @a byte indicates the error position.
 json.exception.parse_error.102 | parse error at 14: missing or wrong low surrogate | JSON uses the `\uxxxx` format to describe Unicode characters. Code points above above 0xFFFF are split into two `\uxxxx` entries ("surrogate pairs"). This error indicates that the surrogate pair is incomplete or contains an invalid code point.
 json.exception.parse_error.103 | parse error: code points above 0x10FFFF are invalid | Unicode supports code points up to 0x10FFFF. Code points above 0x10FFFF are invalid.
 json.exception.parse_error.104 | parse error: JSON patch must be an array of objects | [RFC 6902](https://tools.ietf.org/html/rfc6902) requires a JSON Patch document to be a JSON document that represents an array of objects.
@@ -1916,7 +1916,7 @@ json.exception.parse_error.112 | parse error at 1: error reading CBOR; last byte
 json.exception.parse_error.113 | parse error at 2: expected a CBOR string; last byte: 0x98 | While parsing a map key, a value that is not a string has been read.
 json.exception.parse_error.114 | parse error: Unsupported BSON record type 0x0F | The parsing of the corresponding BSON record type is not implemented (yet).
 
-@note For an input with n bytes, 1 is the index of the first character and n+1
+@note For an txt_json with n bytes, 1 is the index of the first character and n+1
       is the index of the terminating null byte or the end of file. This also
       holds true when reading a byte vector (CBOR or MessagePack).
 
@@ -1962,9 +1962,9 @@ caught.,parse_error}
             /*!
     @brief byte index of the parse error
 
-    The byte index of the last read character in the input file.
+    The byte index of the last read character in the txt_json file.
 
-    @note For an input with n bytes, 1 is the index of the first character and
+    @note For an txt_json with n bytes, 1 is the index of the first character and
           n+1 is the index of the terminating null byte or the end of file.
           This also holds true when reading a byte vector (CBOR or MessagePack).
     */
@@ -2089,7 +2089,7 @@ caught.,type_error}
 /*!
 @brief exception indicating access out of the defined range
 
-This exception is thrown in case a library function is called on an input
+This exception is thrown in case a library function is called on an txt_json
 parameter that exceeds the expected range, for instance in case of array
 indices or nonexisting object keys.
 
@@ -3840,7 +3840,7 @@ namespace nlohmann
 
 // #include <nlohmann/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/input/binary_reader.hpp>
+// #include <nlohmann/detail/txt_json/binary_reader.hpp>
 
 
 #include <algorithm> // generate_n
@@ -3858,7 +3858,7 @@ namespace nlohmann
 
 // #include <nlohmann/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann/detail/txt_json/input_adapters.hpp>
 
 
 #include <array> // array
@@ -3883,19 +3883,19 @@ namespace nlohmann
 {
     namespace detail
     {
-/// the supported input formats
+/// the supported txt_json formats
         enum class input_format_t { json, cbor, msgpack, ubjson, bson };
 
 ////////////////////
-// input adapters //
+// txt_json adapters //
 ////////////////////
 
 /*!
-@brief abstract input adapter interface
+@brief abstract txt_json adapter interface
 
 Produces a stream of std::char_traits<char>::int_type characters from a
-std::istream, a buffer, or some other input type. Accepts the return of
-exactly one non-EOF character for future input. The int_type characters
+std::istream, a buffer, or some other txt_json type. Accepts the return of
+exactly one non-EOF character for future txt_json. The int_type characters
 returned consist of all valid char values as positive values (typically
 unsigned char), plus an EOF value outside that range, specified by the value
 of the function std::char_traits<char>::eof(). This value is typically -1, but
@@ -3912,7 +3912,7 @@ could be any arbitrary value which is not a valid char value.
         using input_adapter_t = std::shared_ptr<input_adapter_protocol>;
 
 /*!
-Input adapter for stdio file access. This adapter read only 1 byte and do not use any
+txt_json adapter for stdio file access. This adapter read only 1 byte and do not use any
  buffer. This adapter is a very low level adapter.
 */
         class file_input_adapter : public input_adapter_protocol
@@ -3942,13 +3942,13 @@ Input adapter for stdio file access. This adapter read only 1 byte and do not us
 
 
 /*!
-Input adapter for a (caching) istream. Ignores a UFT Byte Order Mark at
-beginning of input. Does not support changing the underlying std::streambuf
-in mid-input. Maintains underlying std::istream and std::streambuf to support
-subsequent use of standard std::istream operations to process any input
-characters following those used in parsing the JSON input.  Clears the
-std::istream flags; any input errors (e.g., EOF) will be detected by the first
-subsequent call for input from the std::istream.
+txt_json adapter for a (caching) istream. Ignores a UFT Byte Order Mark at
+beginning of txt_json. Does not support changing the underlying std::streambuf
+in mid-txt_json. Maintains underlying std::istream and std::streambuf to support
+subsequent use of standard std::istream operations to process any txt_json
+characters following those used in parsing the JSON txt_json.  Clears the
+std::istream flags; any txt_json errors (e.g., EOF) will be detected by the first
+subsequent call for txt_json from the std::istream.
 */
         class input_stream_adapter : public input_adapter_protocol
         {
@@ -3985,12 +3985,12 @@ subsequent call for input from the std::istream.
             }
 
         private:
-            /// the associated input stream
+            /// the associated txt_json stream
             std::istream& is;
             std::streambuf& sb;
         };
 
-/// input adapter for buffer input
+/// txt_json adapter for buffer txt_json
         class input_buffer_adapter : public input_adapter_protocol
         {
         public:
@@ -4201,11 +4201,11 @@ subsequent call for input from the std::istream.
             JSON_HEDLEY_NON_NULL(2)
             input_adapter(std::FILE* file)
                     : ia(std::make_shared<file_input_adapter>(file)) {}
-            /// input adapter for input stream
+            /// txt_json adapter for txt_json stream
             input_adapter(std::istream& i)
                     : ia(std::make_shared<input_stream_adapter>(i)) {}
 
-            /// input adapter for input stream
+            /// txt_json adapter for txt_json stream
             input_adapter(std::istream&& i)
                     : ia(std::make_shared<input_stream_adapter>(i)) {}
 
@@ -4218,7 +4218,7 @@ subsequent call for input from the std::istream.
             input_adapter(const std::u32string& ws)
                     : ia(std::make_shared<wide_string_input_adapter<std::u32string>>(ws)) {}
 
-            /// input adapter for buffer
+            /// txt_json adapter for buffer
             template<typename CharT,
                     typename std::enable_if<
                             std::is_pointer<CharT>::value and
@@ -4230,7 +4230,7 @@ subsequent call for input from the std::istream.
 
             // derived support
 
-            /// input adapter for string literal
+            /// txt_json adapter for string literal
             template<typename CharT,
                     typename std::enable_if<
                             std::is_pointer<CharT>::value and
@@ -4241,7 +4241,7 @@ subsequent call for input from the std::istream.
                     : input_adapter(reinterpret_cast<const char*>(b),
                                     std::strlen(reinterpret_cast<const char*>(b))) {}
 
-            /// input adapter for iterator range with contiguous storage
+            /// txt_json adapter for iterator range with contiguous storage
             template<class IteratorType,
                     typename std::enable_if<
                             std::is_same<typename iterator_traits<IteratorType>::iterator_category, std::random_access_iterator_tag>::value,
@@ -4279,12 +4279,12 @@ subsequent call for input from the std::istream.
                 }
             }
 
-            /// input adapter for array
+            /// txt_json adapter for array
             template<class T, std::size_t N>
             input_adapter(T (&array)[N])
                     : input_adapter(std::begin(array), std::end(array)) {}
 
-            /// input adapter for contiguous container
+            /// txt_json adapter for contiguous container
             template<class ContiguousContainer, typename
             std::enable_if<not std::is_pointer<ContiguousContainer>::value and
                            std::is_base_of<std::random_access_iterator_tag, typename iterator_traits<decltype(std::begin(std::declval<ContiguousContainer const>()))>::iterator_category>::value,
@@ -4304,7 +4304,7 @@ subsequent call for input from the std::istream.
     }  // namespace detail
 }  // namespace nlohmann
 
-// #include <nlohmann/detail/input/json_sax.hpp>
+// #include <nlohmann/detail/txt_json/json_sax.hpp>
 
 
 #include <cassert> // assert
@@ -4325,9 +4325,9 @@ namespace nlohmann
 @brief SAX interface
 
 This class describes the SAX interface used by @ref nlohmann::json::sax_parse.
-Each function is called in different situations while the input is parsed. The
+Each function is called in different situations while the txt_json is parsed. The
 boolean return value informs the parser whether to continue processing the
-input.
+txt_json.
 */
     template<typename BasicJsonType>
     struct json_sax
@@ -4422,7 +4422,7 @@ input.
 
         /*!
     @brief a parse error occurred
-    @param[in] position    the position in the input where the error occurs
+    @param[in] position    the position in the txt_json where the error occurs
     @param[in] last_token  the last read token
     @param[in] ex          an exception object describing the error
     @return whether parsing should proceed (must return false)
@@ -5184,7 +5184,7 @@ namespace nlohmann
             /*!
     @brief create a binary reader
 
-    @param[in] adapter  input adapter to read from
+    @param[in] adapter  txt_json adapter to read from
     */
             explicit binary_reader(input_adapter_t adapter) : ia(std::move(adapter))
             {
@@ -5202,7 +5202,7 @@ namespace nlohmann
             /*!
     @param[in] format  the binary format to parse
     @param[in] sax_    a SAX event processor
-    @param[in] strict  whether to expect the input to be consumed completed
+    @param[in] strict  whether to expect the txt_json to be consumed completed
 
     @return
     */
@@ -5251,7 +5251,7 @@ namespace nlohmann
                     if (JSON_HEDLEY_UNLIKELY(current != std::char_traits<char>::eof()))
                     {
                         return sax->parse_error(chars_read, get_token_string(),
-                                                parse_error::create(110, chars_read, exception_message(format, "expected end of input; last byte: 0x" + get_token_string(), "value")));
+                                                parse_error::create(110, chars_read, exception_message(format, "expected end of txt_json; last byte: 0x" + get_token_string(), "value")));
                     }
                 }
 
@@ -5298,7 +5298,7 @@ namespace nlohmann
             }
 
             /*!
-    @brief Parses a C-style string from the BSON input.
+    @brief Parses a C-style string from the BSON txt_json.
     @param[in, out] result  A reference to the string variable where the read
                             string is to be stored.
     @return `true` if the \x00-byte indicating the end of the string was
@@ -5326,7 +5326,7 @@ namespace nlohmann
 
             /*!
     @brief Parses a zero-terminated string of length @a len from the BSON
-           input.
+           txt_json.
     @param[in] len  The length (including the zero-byte at the end) of the
                     string to be read.
     @param[in, out] result  A reference to the string variable where the read
@@ -5350,7 +5350,7 @@ namespace nlohmann
             /*!
     @brief Read a BSON document element of the given @a element_type.
     @param[in] element_type The BSON element type, c.f. http://bsonspec.org/spec.html
-    @param[in] element_type_parse_position The position in the input stream,
+    @param[in] element_type_parse_position The position in the txt_json stream,
                where the `element_type` was read.
     @warning Not all BSON element types are supported yet. An unsupported
              @a element_type will give rise to a parse_error.114:
@@ -5462,7 +5462,7 @@ namespace nlohmann
             }
 
             /*!
-    @brief Reads an array from the BSON input and passes it to the SAX-parser.
+    @brief Reads an array from the BSON txt_json and passes it to the SAX-parser.
     @return whether a valid BSON-array was passed to the SAX parser
     */
             bool parse_bson_array()
@@ -5489,7 +5489,7 @@ namespace nlohmann
 
             /*!
     @param[in] get_char  whether a new character should be retrieved from the
-                         input (true, default) or whether the last read
+                         txt_json (true, default) or whether the last read
                          character should be considered instead
 
     @return whether a valid CBOR value was passed to the SAX parser
@@ -6507,7 +6507,7 @@ namespace nlohmann
 
             /*!
     @param[in] get_char  whether a new character should be retrieved from the
-                         input (true, default) or whether the last read
+                         txt_json (true, default) or whether the last read
                          character should be considered instead
 
     @return whether a valid UBJSON value was passed to the SAX parser
@@ -6526,7 +6526,7 @@ namespace nlohmann
 
     @param[out] result   created string
     @param[in] get_char  whether a new character should be retrieved from the
-                         input (true, default) or whether the last read
+                         txt_json (true, default) or whether the last read
                          character should be considered instead
 
     @return whether string creation completed
@@ -6938,13 +6938,13 @@ namespace nlohmann
             ///////////////////////
 
             /*!
-    @brief get next character from the input
+    @brief get next character from the txt_json
 
-    This function provides the interface to the used input adapter. It does
-    not throw in case the input reached EOF, but returns a -'ve valued
+    This function provides the interface to the used txt_json adapter. It does
+    not throw in case the txt_json reached EOF, but returns a -'ve valued
     `std::char_traits<char>::eof()` in that case.
 
-    @return character read from the input
+    @return character read from the txt_json
     */
             int get()
             {
@@ -6953,7 +6953,7 @@ namespace nlohmann
             }
 
             /*!
-    @return character read from the input after ignoring all 'N' entries
+    @return character read from the txt_json after ignoring all 'N' entries
     */
             int get_ignore_noop()
             {
@@ -6967,7 +6967,7 @@ namespace nlohmann
             }
 
             /*
-    @brief read a number from the input
+    @brief read a number from the txt_json
 
     @tparam NumberType the type of the number
     @param[in] format   the current format (for diagnostics)
@@ -6982,7 +6982,7 @@ namespace nlohmann
             template<typename NumberType, bool InputIsLittleEndian = false>
             bool get_number(const input_format_t format, NumberType& result)
             {
-                // step 1: read input into array with system's byte order
+                // step 1: read txt_json into array with system's byte order
                 std::array<std::uint8_t, sizeof(NumberType)> vec;
                 for (std::size_t i = 0; i < sizeof(NumberType); ++i)
                 {
@@ -7009,7 +7009,7 @@ namespace nlohmann
             }
 
             /*!
-    @brief create a string by reading characters from the input
+    @brief create a string by reading characters from the txt_json
 
     @tparam NumberType the type of the number
     @param[in] format the current format (for diagnostics)
@@ -7020,7 +7020,7 @@ namespace nlohmann
 
     @note We can not reserve @a len bytes for the result, because @a len
           may be too large. Usually, @ref unexpect_eof() detects the end of
-          the input before we run out of string memory.
+          the txt_json before we run out of string memory.
     */
             template<typename NumberType>
             bool get_string(const input_format_t format,
@@ -7051,7 +7051,7 @@ namespace nlohmann
                 if (JSON_HEDLEY_UNLIKELY(current == std::char_traits<char>::eof()))
                 {
                     return sax->parse_error(chars_read, "<end of file>",
-                                            parse_error::create(110, chars_read, exception_message(format, "unexpected end of input", context)));
+                                            parse_error::create(110, chars_read, exception_message(format, "unexpected end of txt_json", context)));
                 }
                 return true;
             }
@@ -7104,7 +7104,7 @@ namespace nlohmann
             }
 
         private:
-            /// input adapter
+            /// txt_json adapter
             input_adapter_t ia = nullptr;
 
             /// the current character
@@ -7122,9 +7122,9 @@ namespace nlohmann
     }  // namespace detail
 }  // namespace nlohmann
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann/detail/txt_json/input_adapters.hpp>
 
-// #include <nlohmann/detail/input/lexer.hpp>
+// #include <nlohmann/detail/txt_json/lexer.hpp>
 
 
 #include <array> // array
@@ -7137,9 +7137,9 @@ namespace nlohmann
 #include <utility> // move
 #include <vector> // vector
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann/detail/txt_json/input_adapters.hpp>
 
-// #include <nlohmann/detail/input/position_t.hpp>
+// #include <nlohmann/detail/txt_json/position_t.hpp>
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -7184,7 +7184,7 @@ This class organizes the lexical analysis during JSON deserialization.
                 name_separator,   ///< the name separator `:`
                 value_separator,  ///< the value separator `,`
                 parse_error,      ///< indicating a parse error
-                end_of_input,     ///< indicating the end of the input buffer
+                end_of_input,     ///< indicating the end of the txt_json buffer
                 literal_or_value  ///< a literal or the begin of a value (only for diagnostics)
             };
 
@@ -7224,7 +7224,7 @@ This class organizes the lexical analysis during JSON deserialization.
                     case token_type::parse_error:
                         return "<parse error>";
                     case token_type::end_of_input:
-                        return "end of input";
+                        return "end of txt_json";
                     case token_type::literal_or_value:
                         return "'[', '{', or a literal";
                         // LCOV_EXCL_START
@@ -7265,7 +7265,7 @@ This class organizes the lexical analysis during JSON deserialization.
             /*!
     @brief get codepoint from 4 hex characters following `\u`
 
-    For input "\u c1 c2 c3 c4" the codepoint is:
+    For txt_json "\u c1 c2 c3 c4" the codepoint is:
       (c1 * 0x1000) + (c2 * 0x0100) + (c3 * 0x0010) + c4
     = (c1 << 12) + (c2 << 8) + (c3 << 4) + (c4 << 0)
 
@@ -7973,7 +7973,7 @@ This class organizes the lexical analysis during JSON deserialization.
 
     The function is realized with a deterministic finite state machine derived
     from the grammar described in RFC 7159. Starting in state "init", the
-    input is read and used to determined the next state. Only state "done"
+    txt_json is read and used to determined the next state. Only state "done"
     accepts the number. State "error" is a trap state to model errors. In the
     table below, "anything" means any character but the ones listed before.
 
@@ -8353,7 +8353,7 @@ This class organizes the lexical analysis during JSON deserialization.
             }
 
             /////////////////////
-            // input management
+            // txt_json management
             /////////////////////
 
             /// reset token_buffer; current character is beginning of token
@@ -8365,14 +8365,14 @@ This class organizes the lexical analysis during JSON deserialization.
             }
 
             /*
-    @brief get next character from the input
+    @brief get next character from the txt_json
 
-    This function provides the interface to the used input adapter. It does
-    not throw in case the input reached EOF, but returns a
+    This function provides the interface to the used txt_json adapter. It does
+    not throw in case the txt_json reached EOF, but returns a
     `std::char_traits<char>::eof()` in that case.  Stores the scanned characters
     for use in error messages.
 
-    @return character read from the input
+    @return character read from the txt_json
     */
             std::char_traits<char>::int_type get()
             {
@@ -8406,7 +8406,7 @@ This class organizes the lexical analysis during JSON deserialization.
             /*!
     @brief unget current character (read it again on next get)
 
-    We implement unget by setting variable next_unget to true. The input is not
+    We implement unget by setting variable next_unget to true. The txt_json is not
     changed - we just simulate ungetting by modifying chars_read_total,
     chars_read_current_line, and token_string. The next call to get() will
     behave as if the unget character is read again.
@@ -8595,7 +8595,7 @@ This class organizes the lexical analysis during JSON deserialization.
                     case '9':
                         return scan_number();
 
-                        // end of input (the null byte is needed when parsing from
+                        // end of txt_json (the null byte is needed when parsing from
                         // string literals)
                     case '\0':
                     case std::char_traits<char>::eof():
@@ -8609,7 +8609,7 @@ This class organizes the lexical analysis during JSON deserialization.
             }
 
         private:
-            /// input adapter
+            /// txt_json adapter
             detail::input_adapter_t ia = nullptr;
 
             /// the current character
@@ -8621,7 +8621,7 @@ This class organizes the lexical analysis during JSON deserialization.
             /// the start position of the current token
             position_t position {};
 
-            /// raw input token string (for error messages)
+            /// raw txt_json token string (for error messages)
             std::vector<char> token_string {};
 
             /// buffer for variable-length tokens (numbers, strings)
@@ -8641,7 +8641,7 @@ This class organizes the lexical analysis during JSON deserialization.
     }  // namespace detail
 }  // namespace nlohmann
 
-// #include <nlohmann/detail/input/parser.hpp>
+// #include <nlohmann/detail/txt_json/parser.hpp>
 
 
 #include <cassert> // assert
@@ -8654,11 +8654,11 @@ This class organizes the lexical analysis during JSON deserialization.
 
 // #include <nlohmann/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann/detail/txt_json/input_adapters.hpp>
 
-// #include <nlohmann/detail/input/json_sax.hpp>
+// #include <nlohmann/detail/txt_json/json_sax.hpp>
 
-// #include <nlohmann/detail/input/lexer.hpp>
+// #include <nlohmann/detail/txt_json/lexer.hpp>
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -8710,7 +8710,7 @@ This class implements a recursive decent parser.
             using parser_callback_t =
                     std::function<bool(int depth, parse_event_t event, BasicJsonType& parsed)>;
 
-            /// a parser reading from an input adapter
+            /// a parser reading from an txt_json adapter
             explicit parser(detail::input_adapter_t&& adapter,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions_ = true)
@@ -8738,7 +8738,7 @@ This class implements a recursive decent parser.
                     sax_parse_internal(&sdp);
                     result.assert_invariant();
 
-                    // in strict mode, input must be completely read
+                    // in strict mode, txt_json must be completely read
                     if (strict and (get_token() != token_type::end_of_input))
                     {
                         sdp.parse_error(m_lexer.get_position(),
@@ -8767,7 +8767,7 @@ This class implements a recursive decent parser.
                     sax_parse_internal(&sdp);
                     result.assert_invariant();
 
-                    // in strict mode, input must be completely read
+                    // in strict mode, txt_json must be completely read
                     if (strict and (get_token() != token_type::end_of_input))
                     {
                         sdp.parse_error(m_lexer.get_position(),
@@ -8789,7 +8789,7 @@ This class implements a recursive decent parser.
     @brief public accept interface
 
     @param[in] strict  whether to expect the last token to be EOF
-    @return whether the input is a proper JSON text
+    @return whether the txt_json is a proper JSON text
     */
             bool accept(const bool strict = true)
             {
@@ -10839,7 +10839,7 @@ namespace nlohmann
         }
 
         /*!
-    @brief split the string input to reference tokens
+    @brief split the string txt_json to reference tokens
 
     @note This function is only called by the json_pointer constructor.
           All exceptions below are documented there.
@@ -11172,7 +11172,7 @@ namespace nlohmann
 #include <limits> // numeric_limits
 #include <string> // string
 
-// #include <nlohmann/detail/input/binary_reader.hpp>
+// #include <nlohmann/detail/txt_json/binary_reader.hpp>
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -12548,7 +12548,7 @@ namespace nlohmann
             ///////////////////////
 
             /*
-    @brief write a number to output input
+    @brief write a number to output txt_json
     @param[in] n number of type @a NumberType
     @tparam NumberType the type of the number
     @tparam OutputIsLittleEndian Set to true if output data is
@@ -12822,7 +12822,7 @@ For a detailed description of the algorithm see:
             };
 
 /*!
-Compute the (normalized) diyfp representing the input number 'value' and its
+Compute the (normalized) diyfp representing the txt_json number 'value' and its
 boundaries.
 
 @pre value must be finite and positive
@@ -12871,7 +12871,7 @@ boundaries.
                 //      v+ = v + 2^e
                 //
                 // Let m- = (v- + v) / 2 and m+ = (v + v+) / 2. All real numbers _strictly_
-                // between m- and m+ round to v, regardless of how the input rounding
+                // between m- and m+ round to v, regardless of how the txt_json rounding
                 // algorithm breaks ties.
                 //
                 //      ---+-------------+-------------+-------------+-------------+---  (A)
@@ -13450,7 +13450,7 @@ M- and M+ must be normalized and share the same exponent -60 <= e <= -32.
 
                 // By construction this algorithm generates the shortest possible decimal
                 // number (Loitsch, Theorem 6.2) which rounds back to w.
-                // For an input number of precision p, at least
+                // For an txt_json number of precision p, at least
                 //
                 //      N = 1 + ceil(p * log_10(2))
                 //
@@ -13508,8 +13508,8 @@ The buffer must be large enough, i.e. >= max_digits10.
                 //  --------+---[---------------(---+---)---------------]---+--------
                 //          w-  M-                  w                   M+  w+
                 //
-                // Now any number in [M-, M+] (bounds included) will round to w when input,
-                // regardless of how the input rounding algorithm breaks ties.
+                // Now any number in [M-, M+] (bounds included) will round to w when txt_json,
+                // regardless of how the txt_json rounding algorithm breaks ties.
                 //
                 // And digit_gen generates the shortest possible such number in [M-, M+].
                 // Note that this does not mean that Grisu2 always generates the shortest
@@ -13699,7 +13699,7 @@ notation. Otherwise it will be printed in exponential notation.
 The format of the resulting decimal representation is similar to printf's %g
 format. Returns an iterator pointing past-the-end of the decimal representation.
 
-@note The input number must be finite, i.e. NaN's and Inf's are not supported.
+@note The txt_json number must be finite, i.e. NaN's and Inf's are not supported.
 @note The buffer must be large enough.
 @note The result is NOT null-terminated.
 */
@@ -14295,7 +14295,7 @@ namespace nlohmann
             /*!
     @brief count digits
 
-    Count the number of decimal (base 10) digits for an input unsigned integer.
+    Count the number of decimal (base 10) digits for an txt_json unsigned integer.
 
     @param[in] x  unsigned integer number to count its digits
     @return    number of decimal digits
@@ -16177,7 +16177,7 @@ Format](http://rfc7159.net/rfc7159)
       similar versions for `std::vector` or `std::map`; that is, a JSON array
       or object is constructed from the values in the range.
 
-    @tparam InputIT an input iterator type (@ref iterator or @ref
+    @tparam InputIT an txt_json iterator type (@ref iterator or @ref
     const_iterator)
 
     @param[in] first begin of the range to copy from (included)
@@ -17234,7 +17234,7 @@ Format](http://rfc7159.net/rfc7159)
     @brief get a value (explicit)
 
     Explicit type conversion between the JSON value and a compatible value.
-    The value is filled into the input parameter by calling the @ref json_serializer<ValueType>
+    The value is filled into the txt_json parameter by calling the @ref json_serializer<ValueType>
     `from_json()` method.
 
     The function is equivalent to executing
@@ -17248,9 +17248,9 @@ Format](http://rfc7159.net/rfc7159)
     - @ref json_serializer<ValueType> has a `from_json()` method of the form
       `void from_json(const basic_json&, ValueType&)`, and
 
-    @tparam ValueType the input parameter type.
+    @tparam ValueType the txt_json parameter type.
 
-    @return the input parameter, allowing chaining calls.
+    @return the txt_json parameter, allowing chaining calls.
 
     @throw what @ref json_serializer<ValueType> `from_json()` method throws
 
@@ -20679,12 +20679,12 @@ Format](http://rfc7159.net/rfc7159)
         /// @{
 
         /*!
-    @brief deserialize from a compatible input
+    @brief deserialize from a compatible txt_json
 
-    This function reads from a compatible input. Examples are:
+    This function reads from a compatible txt_json. Examples are:
     - an array of 1-byte values
     - strings with character/literal type with size of 1 byte
-    - input streams
+    - txt_json streams
     - container with contiguous storage of 1-byte values. Compatible container
       types include `std::vector`, `std::string`, `std::array`,
       `std::valarray`, and `std::initializer_list`. Furthermore, C-style
@@ -20705,7 +20705,7 @@ Format](http://rfc7159.net/rfc7159)
              assertions switched off, the behavior is undefined and will most
              likely yield segmentation violation.
 
-    @param[in] i  input to read from
+    @param[in] i  txt_json to read from
     @param[in] cb  a parser callback function of type @ref parser_callback_t
     which is used to control the deserialization by filtering unwanted values
     (optional)
@@ -20717,11 +20717,11 @@ Format](http://rfc7159.net/rfc7159)
             value_t::discarded.
 
     @throw parse_error.101 if a parse error occurs; example: `""unexpected end
-    of input; expected string literal""`
+    of txt_json; expected string literal""`
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
+    @complexity Linear in the length of the txt_json. The parser is a predictive
     LL(1) parser. The complexity can be higher if the parser callback function
     @a cb has a super-linear complexity.
 
@@ -20761,10 +20761,10 @@ Format](http://rfc7159.net/rfc7159)
 
     The SAX event lister must follow the interface of @ref json_sax.
 
-    This function reads from a compatible input. Examples are:
+    This function reads from a compatible txt_json. Examples are:
     - an array of 1-byte values
     - strings with character/literal type with size of 1 byte
-    - input streams
+    - txt_json streams
     - container with contiguous storage of 1-byte values. Compatible container
       types include `std::vector`, `std::string`, `std::array`,
       `std::valarray`, and `std::initializer_list`. Furthermore, C-style
@@ -20785,19 +20785,19 @@ Format](http://rfc7159.net/rfc7159)
              assertions switched off, the behavior is undefined and will most
              likely yield segmentation violation.
 
-    @param[in] i  input to read from
+    @param[in] i  txt_json to read from
     @param[in,out] sax  SAX event listener
     @param[in] format  the format to parse (JSON, CBOR, MessagePack, or UBJSON)
-    @param[in] strict  whether the input has to be consumed completely
+    @param[in] strict  whether the txt_json has to be consumed completely
 
     @return return value of the last processed SAX event
 
     @throw parse_error.101 if a parse error occurs; example: `""unexpected end
-    of input; expected string literal""`
+    of txt_json; expected string literal""`
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
+    @complexity Linear in the length of the txt_json. The parser is a predictive
     LL(1) parser. The complexity can be higher if the SAX consumer @a sax has
     a super-linear complexity.
 
@@ -20859,7 +20859,7 @@ Format](http://rfc7159.net/rfc7159)
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
+    @complexity Linear in the length of the txt_json. The parser is a predictive
     LL(1) parser. The complexity can be higher if the parser callback function
     @a cb has a super-linear complexity.
 
@@ -20919,16 +20919,16 @@ Format](http://rfc7159.net/rfc7159)
         /*!
     @brief deserialize from stream
 
-    Deserializes an input stream to a JSON value.
+    Deserializes an txt_json stream to a JSON value.
 
-    @param[in,out] i  input stream to read a serialized JSON value from
-    @param[in,out] j  JSON value to write the deserialized input to
+    @param[in,out] i  txt_json stream to read a serialized JSON value from
+    @param[in,out] j  JSON value to write the deserialized txt_json to
 
     @throw parse_error.101 in case of an unexpected token
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
+    @complexity Linear in the length of the txt_json. The parser is a predictive
     LL(1) parser.
 
     @note A UTF-8 byte order mark is silently ignored.
@@ -21364,7 +21364,7 @@ Format](http://rfc7159.net/rfc7159)
     @throw out_of_range.409  if a key in `j` contains a NULL (U+0000)
     @throw type_error.317    if `!j.is_object()`
 
-    @pre The input `j` is required to be an object: `j.is_object() == true`.
+    @pre The txt_json `j` is required to be an object: `j.is_object() == true`.
 
     @note Any BSON output created via @ref to_bson can be successfully parsed
           by @ref from_bson.
@@ -21397,7 +21397,7 @@ Format](http://rfc7159.net/rfc7159)
            corresponding BSON-representation to the given output_adapter `o`.
     @param j The JSON object to convert to BSON.
     @param o The output adapter that receives the binary BSON representation.
-    @pre The input `j` shall be an object: `j.is_object() == true`
+    @pre The txt_json `j` shall be an object: `j.is_object() == true`
     @sa @ref to_bson(const basic_json&)
     */
         static void to_bson(const basic_json& j, detail::output_adapter<uint8_t> o)
@@ -21415,9 +21415,9 @@ Format](http://rfc7159.net/rfc7159)
 
 
         /*!
-    @brief create a JSON value from an input in CBOR format
+    @brief create a JSON value from an txt_json in CBOR format
 
-    Deserializes a given input @a i to a JSON value using the CBOR (Concise
+    Deserializes a given txt_json @a i to a JSON value using the CBOR (Concise
     Binary Object Representation) serialization format.
 
     The library maps CBOR types to JSON value types as follows:
@@ -21480,8 +21480,8 @@ Format](http://rfc7159.net/rfc7159)
     @note Any CBOR output created @ref to_cbor can be successfully parsed by
           @ref from_cbor.
 
-    @param[in] i  an input in CBOR format convertible to an input adapter
-    @param[in] strict  whether to expect the input to be consumed until EOF
+    @param[in] i  an txt_json in CBOR format convertible to an txt_json adapter
+    @param[in] strict  whether to expect the txt_json to be consumed until EOF
                        (true by default)
     @param[in] allow_exceptions  whether to throw exceptions in case of a
     parse error (optional, true by default)
@@ -21490,13 +21490,13 @@ Format](http://rfc7159.net/rfc7159)
             @a allow_exceptions set to `false`, the return value will be
             value_t::discarded.
 
-    @throw parse_error.110 if the given input ends prematurely or the end of
+    @throw parse_error.110 if the given txt_json ends prematurely or the end of
     file was not reached when @a strict was set to true
     @throw parse_error.112 if unsupported features from CBOR were
-    used in the given input @a v or if the input is not valid CBOR
+    used in the given txt_json @a v or if the txt_json is not valid CBOR
     @throw parse_error.113 if a string was expected as map key, but not found
 
-    @complexity Linear in the size of the input @a i.
+    @complexity Linear in the size of the txt_json @a i.
 
     @liveexample{The example shows the deserialization of a byte vector in CBOR
     format to a JSON value.,from_cbor}
@@ -21509,7 +21509,7 @@ Format](http://rfc7159.net/rfc7159)
         related UBJSON format
 
     @since version 2.0.9; parameter @a start_index since 2.1.1; changed to
-           consume input adapters, removed start_index parameter, and added
+           consume txt_json adapters, removed start_index parameter, and added
            @a strict parameter since 3.0.0; added @a allow_exceptions parameter
            since 3.2.0
     */
@@ -21541,9 +21541,9 @@ Format](http://rfc7159.net/rfc7159)
         }
 
         /*!
-    @brief create a JSON value from an input in MessagePack format
+    @brief create a JSON value from an txt_json in MessagePack format
 
-    Deserializes a given input @a i to a JSON value using the MessagePack
+    Deserializes a given txt_json @a i to a JSON value using the MessagePack
     serialization format.
 
     The library maps MessagePack types to JSON value types as follows:
@@ -21586,9 +21586,9 @@ Format](http://rfc7159.net/rfc7159)
     @note Any MessagePack output created @ref to_msgpack can be successfully
           parsed by @ref from_msgpack.
 
-    @param[in] i  an input in MessagePack format convertible to an input
+    @param[in] i  an txt_json in MessagePack format convertible to an txt_json
                   adapter
-    @param[in] strict  whether to expect the input to be consumed until EOF
+    @param[in] strict  whether to expect the txt_json to be consumed until EOF
                        (true by default)
     @param[in] allow_exceptions  whether to throw exceptions in case of a
     parse error (optional, true by default)
@@ -21597,13 +21597,13 @@ Format](http://rfc7159.net/rfc7159)
             @a allow_exceptions set to `false`, the return value will be
             value_t::discarded.
 
-    @throw parse_error.110 if the given input ends prematurely or the end of
+    @throw parse_error.110 if the given txt_json ends prematurely or the end of
     file was not reached when @a strict was set to true
     @throw parse_error.112 if unsupported features from MessagePack were
-    used in the given input @a i or if the input is not valid MessagePack
+    used in the given txt_json @a i or if the txt_json is not valid MessagePack
     @throw parse_error.113 if a string was expected as map key, but not found
 
-    @complexity Linear in the size of the input @a i.
+    @complexity Linear in the size of the txt_json @a i.
 
     @liveexample{The example shows the deserialization of a byte vector in
     MessagePack format to a JSON value.,from_msgpack}
@@ -21618,7 +21618,7 @@ Format](http://rfc7159.net/rfc7159)
         the related BSON format
 
     @since version 2.0.9; parameter @a start_index since 2.1.1; changed to
-           consume input adapters, removed start_index parameter, and added
+           consume txt_json adapters, removed start_index parameter, and added
            @a strict parameter since 3.0.0; added @a allow_exceptions parameter
            since 3.2.0
     */
@@ -21650,9 +21650,9 @@ Format](http://rfc7159.net/rfc7159)
         }
 
         /*!
-    @brief create a JSON value from an input in UBJSON format
+    @brief create a JSON value from an txt_json in UBJSON format
 
-    Deserializes a given input @a i to a JSON value using the UBJSON (Universal
+    Deserializes a given txt_json @a i to a JSON value using the UBJSON (Universal
     Binary JSON) serialization format.
 
     The library maps UBJSON types to JSON value types as follows:
@@ -21678,8 +21678,8 @@ Format](http://rfc7159.net/rfc7159)
     @note The mapping is **complete** in the sense that any UBJSON value can
           be converted to a JSON value.
 
-    @param[in] i  an input in UBJSON format convertible to an input adapter
-    @param[in] strict  whether to expect the input to be consumed until EOF
+    @param[in] i  an txt_json in UBJSON format convertible to an txt_json adapter
+    @param[in] strict  whether to expect the txt_json to be consumed until EOF
                        (true by default)
     @param[in] allow_exceptions  whether to throw exceptions in case of a
     parse error (optional, true by default)
@@ -21688,12 +21688,12 @@ Format](http://rfc7159.net/rfc7159)
             @a allow_exceptions set to `false`, the return value will be
             value_t::discarded.
 
-    @throw parse_error.110 if the given input ends prematurely or the end of
+    @throw parse_error.110 if the given txt_json ends prematurely or the end of
     file was not reached when @a strict was set to true
     @throw parse_error.112 if a parse error occurs
     @throw parse_error.113 if a string could not be parsed successfully
 
-    @complexity Linear in the size of the input @a i.
+    @complexity Linear in the size of the txt_json @a i.
 
     @liveexample{The example shows the deserialization of a byte vector in
     UBJSON format to a JSON value.,from_ubjson}
@@ -21738,9 +21738,9 @@ Format](http://rfc7159.net/rfc7159)
         }
 
         /*!
-    @brief Create a JSON value from an input in BSON format
+    @brief Create a JSON value from an txt_json in BSON format
 
-    Deserializes a given input @a i to a JSON value using the BSON (Binary JSON)
+    Deserializes a given txt_json @a i to a JSON value using the BSON (Binary JSON)
     serialization format.
 
     The library maps BSON record types to JSON value types as follows:
@@ -21771,8 +21771,8 @@ Format](http://rfc7159.net/rfc7159)
     @warning The mapping is **incomplete**. The unsupported mappings
              are indicated in the table above.
 
-    @param[in] i  an input in BSON format convertible to an input adapter
-    @param[in] strict  whether to expect the input to be consumed until EOF
+    @param[in] i  an txt_json in BSON format convertible to an txt_json adapter
+    @param[in] strict  whether to expect the txt_json to be consumed until EOF
                        (true by default)
     @param[in] allow_exceptions  whether to throw exceptions in case of a
     parse error (optional, true by default)
@@ -21783,7 +21783,7 @@ Format](http://rfc7159.net/rfc7159)
 
     @throw parse_error.114 if an unsupported BSON record type is encountered
 
-    @complexity Linear in the size of the input @a i.
+    @complexity Linear in the size of the txt_json @a i.
 
     @liveexample{The example shows the deserialization of a byte vector in
     BSON format to a JSON value.,from_bson}
